@@ -33,12 +33,11 @@ class CohereEmbeddings(Embeddings):
         )
         return response.embeddings[0]
 
-# --- 여러 PDF 파일 로드 ---
-pdf_files = ['H1J.pdf', 'H3J.pdf']  # 여기에 PDF 파일명 추가
-
+# --- PDF 문서 로드 ---
+pdf_files = ['H1J.pdf', 'H3J.pdf']  # 여기에 파일 추가 가능
 documents = []
-for pdf_file in pdf_files:
-    loader = PyPDFLoader(pdf_file)
+for file in pdf_files:
+    loader = PyPDFLoader(file)
     documents.extend(loader.load())
 
 # --- 텍스트 분할 ---
@@ -48,10 +47,9 @@ texts = text_splitter.split_documents(documents)
 # --- 벡터 저장소 생성 ---
 embeddings = CohereEmbeddings(client=cohere_client)
 vector_store = Chroma.from_documents(texts, embedding=embeddings)
-
 retriever = vector_store.as_retriever(search_kwargs={"k": 4})
 
-# --- Cohere Chat API 호출 함수 ---
+# --- Chat API 호출 함수 ---
 def cohere_chat_generate(prompt: str) -> str:
     response = cohere_client.chat(message=prompt)
     return response.text
@@ -63,7 +61,7 @@ st.title("🤖 학교 전용 챗봇 (전공심화탐구)")
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{
         "role": "assistant",
-        "content": "안녕하세요! 학교에 대해 궁금한 점을 물어보세요. (학사일정)"
+        "content": "안녕하세요! 학교에 대해 궁금한 점을 물어보세요. (학사일정 등)"
     }]
 
 for msg in st.session_state["messages"]:
@@ -78,7 +76,7 @@ def generate_response(user_question: str) -> str:
 Given the following summaries of a long document and a question, create a final answer with references ("SOURCES"), use "SOURCES" in capital letters regardless of the number of sources.
 If you don't know the answer, just say that "I don't know", don't try to make up an answer.
 If you need it, look it up on the internet.
-You MUST answer in Korean and in Markdown format
+You MUST answer in Korean and in Markdown format.
 
 ----------------
 {context}
@@ -86,8 +84,7 @@ You MUST answer in Korean and in Markdown format
 질문: {user_question}
 답변:"""
 
-    answer = cohere_chat_generate(prompt)
-    return answer
+    return cohere_chat_generate(prompt)
 
 # --- 사용자 입력 처리 ---
 if user_input := st.chat_input("질문을 입력하세요."):
