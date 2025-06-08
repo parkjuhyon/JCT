@@ -6,7 +6,8 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 
-os.environ["COHERE_API_KEY"] = "your-cohere-api-key"  # 본인의 키로 변경
+# 환경 변수 설정
+os.environ["COHERE_API_KEY"] = "your_api_key_here"
 os.environ["CHROMA_API_IMPL"] = "chromadb"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -34,6 +35,7 @@ class CohereEmbeddings(Embeddings):
         )
         return response.embeddings[0]
 
+# PDF 파일 로드 및 문서 분할
 pdf_files = ['H1J.pdf', 'H3J.pdf']
 documents = []
 for pdf_file in pdf_files:
@@ -49,51 +51,10 @@ persist_dir = "./chroma_db"
 if not os.path.exists(persist_dir):
     os.makedirs(persist_dir)
 
+# Chroma 벡터스토어 생성 - embedding 단수형 주의
 vector_store = Chroma.from_documents(
     texts,
-    embedding=embeddings,  # 여긴 embedding 단수로 맞춰야 함
+    embedding=embeddings,
     persist_directory=persist_dir,
     collection_name="school_docs"
 )
-
-retriever = vector_store.as_retriever(search_kwargs={"k": 4})
-
-def cohere_chat_generate(prompt: str) -> str:
-    response = cohere_client.chat(message=prompt)
-    return response.text
-
-st.set_page_config(page_title="PDF 질문 답변 챗봇", page_icon="🤖", layout="wide")
-st.title("🤖 학교 전용 챗봇 (전공심화탐구)")
-
-if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "안녕하세요! 학교에 대해 궁금한 점을 물어보세요. (학사일정)"}]
-
-for msg in st.session_state["messages"]:
-    st.chat_message(msg["role"]).write(msg["content"])
-
-def generate_response(user_question: str) -> str:
-    docs = retriever.get_relevant_documents(user_question)
-    context = "\n\n".join([doc.page_content for doc in docs])
-
-    prompt = f"""Use the following pieces of context to answer the users question shortly.
-Given the following summaries of a long document and a question, create a final answer with references ("SOURCES"), use "SOURCES" in capital letters regardless of the number of sources.
-If you don't know the answer, just say that "I don't know", don't try to make up an answer.
-If you need it, look it up on the internet.
-You MUST answer in Korean and in Markdown format
-
-----------------
-{context}
-
-질문: {user_question}
-답변:"""
-
-    answer = cohere_chat_generate(prompt)
-    return answer
-
-if user_input := st.chat_input("질문을 입력하세요."):
-    st.session_state["messages"].append({"role": "user", "content": user_input})
-    st.chat_message("user").write(user_input)
-
-    answer = generate_response(user_input)
-    st.session_state["messages"].append({"role": "assistant", "content": answer})
-    st.chat_message("assistant").write(answer)
