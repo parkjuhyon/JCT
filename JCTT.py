@@ -6,8 +6,7 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 
-# 환경 변수 설정
-os.environ["COHERE_API_KEY"] = "r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo"
+os.environ["COHERE_API_KEY"] = "your-cohere-api-key"  # 본인의 키로 변경
 os.environ["CHROMA_API_IMPL"] = "chromadb"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -36,7 +35,6 @@ class CohereEmbeddings(Embeddings):
         return response.embeddings[0]
 
 pdf_files = ['H1J.pdf', 'H3J.pdf']
-
 documents = []
 for pdf_file in pdf_files:
     loader = PyPDFLoader(pdf_file)
@@ -53,7 +51,7 @@ if not os.path.exists(persist_dir):
 
 vector_store = Chroma.from_documents(
     texts,
-    embedding=embeddings,
+    embedding=embeddings,  # 여긴 embedding 단수로 맞춰야 함
     persist_directory=persist_dir,
     collection_name="school_docs"
 )
