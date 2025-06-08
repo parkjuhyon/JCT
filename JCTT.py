@@ -6,11 +6,13 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 
-# --- Cohere API 키 설정 ---
+# 환경 변수 명시적 설정 (중요)
 os.environ["COHERE_API_KEY"] = "r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo"
+os.environ["CHROMA_API_IMPL"] = "chromadb"  # chromadb 사용 명시
+os.environ["TOKENIZERS_PARALLELISM"] = "false"  # 토크나이저 병렬화 이슈 방지용
+
 cohere_client = cohere.Client(api_key=os.environ["COHERE_API_KEY"])
 
-# --- Cohere 임베딩 클래스 정의 ---
 class CohereEmbeddings(Embeddings):
     def __init__(self, client, model="embed-multilingual-v3.0"):
         self.client = client
@@ -33,34 +35,37 @@ class CohereEmbeddings(Embeddings):
         )
         return response.embeddings[0]
 
-# --- 여러 PDF 파일 로드 ---
-pdf_files = ['H1J.pdf', 'H3J.pdf']  # 여기에 PDF 파일명 추가
+pdf_files = ['H1J.pdf', 'H3J.pdf']
 
 documents = []
 for pdf_file in pdf_files:
     loader = PyPDFLoader(pdf_file)
     documents.extend(loader.load())
 
-# --- 텍스트 분할 ---
 text_splitter = CharacterTextSplitter(chunk_size=700, chunk_overlap=200)
 texts = text_splitter.split_documents(documents)
 
-# --- 벡터 저장소 생성 (persist_directory 추가) ---
 embeddings = CohereEmbeddings(client=cohere_client)
+
+# persist_directory 폴더가 반드시 존재해야 함
+persist_dir = "./chroma_db"
+if not os.path.exists(persist_dir):
+    os.makedirs(persist_dir)
+
+# Chroma 벡터스토어 생성 (embedding=으로 키 이름 수정)
 vector_store = Chroma.from_documents(
     texts,
     embedding=embeddings,
-    persist_directory="./chroma_db"
+    persist_directory=persist_dir,
+    collection_name="school_docs"
 )
 
 retriever = vector_store.as_retriever(search_kwargs={"k": 4})
 
-# --- Cohere Chat API 호출 함수 ---
 def cohere_chat_generate(prompt: str) -> str:
     response = cohere_client.chat(message=prompt)
     return response.text
 
-# --- Streamlit UI 구성 ---
 st.set_page_config(page_title="PDF 질문 답변 챗봇", page_icon="🤖", layout="wide")
 st.title("🤖 학교 전용 챗봇 (전공심화탐구)")
 
@@ -70,7 +75,6 @@ if "messages" not in st.session_state:
 for msg in st.session_state["messages"]:
     st.chat_message(msg["role"]).write(msg["content"])
 
-# --- 답변 생성 함수 ---
 def generate_response(user_question: str) -> str:
     docs = retriever.get_relevant_documents(user_question)
     context = "\n\n".join([doc.page_content for doc in docs])
@@ -90,7 +94,6 @@ You MUST answer in Korean and in Markdown format
     answer = cohere_chat_generate(prompt)
     return answer
 
-# --- 사용자 입력 처리 ---
 if user_input := st.chat_input("질문을 입력하세요."):
     st.session_state["messages"].append({"role": "user", "content": user_input})
     st.chat_message("user").write(user_input)
