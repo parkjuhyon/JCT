@@ -7,7 +7,7 @@ from langchain.embeddings.base import Embeddings
 import cohere
 
 # 1. 환경 변수 설정 (본인 키로 바꾸기)
-os.environ["COHERE_API_KEY"] = "본인의_코히어_API_키를_여기에_넣으세요"
+os.environ["COHERE_API_KEY"] = "r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo"
 os.environ["CHROMA_API_IMPL"] = "chromadb"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
