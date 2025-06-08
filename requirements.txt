@@ -1,6 +1,9 @@
 streamlit
 langchain
 langchain-community
-chromadb
-pypdf
+chromadb==0.4.22
 cohere
+pypdf
+protobuf==3.20.3
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
