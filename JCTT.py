@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
@@ -47,7 +47,7 @@ texts = text_splitter.split_documents(documents)
 
 # --- 벡터 저장소 생성 ---
 embeddings = CohereEmbeddings(client=cohere_client)
-vector_store = Chroma.from_documents(texts, embeddings)
+vector_store = Chroma.from_documents(texts, embedding=embeddings)
 
 retriever = vector_store.as_retriever(search_kwargs={"k": 4})
 
@@ -61,7 +61,10 @@ st.set_page_config(page_title="PDF 질문 답변 챗봇", page_icon="🤖", layo
 st.title("🤖 학교 전용 챗봇 (전공심화탐구)")
 
 if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "안녕하세요! 학교에 대해 궁금한 점을 물어보세요. (학사일정)"}]
+    st.session_state["messages"] = [{
+        "role": "assistant",
+        "content": "안녕하세요! 학교에 대해 궁금한 점을 물어보세요. (학사일정)"
+    }]
 
 for msg in st.session_state["messages"]:
     st.chat_message(msg["role"]).write(msg["content"])
