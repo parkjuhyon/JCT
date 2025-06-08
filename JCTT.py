@@ -6,10 +6,10 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 
-# 환경 변수 명시적 설정 (중요)
+# 환경 변수 설정
 os.environ["COHERE_API_KEY"] = "r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo"
-os.environ["CHROMA_API_IMPL"] = "chromadb"  # chromadb 사용 명시
-os.environ["TOKENIZERS_PARALLELISM"] = "false"  # 토크나이저 병렬화 이슈 방지용
+os.environ["CHROMA_API_IMPL"] = "chromadb"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 cohere_client = cohere.Client(api_key=os.environ["COHERE_API_KEY"])
 
@@ -47,12 +47,10 @@ texts = text_splitter.split_documents(documents)
 
 embeddings = CohereEmbeddings(client=cohere_client)
 
-# persist_directory 폴더가 반드시 존재해야 함
 persist_dir = "./chroma_db"
 if not os.path.exists(persist_dir):
     os.makedirs(persist_dir)
 
-# Chroma 벡터스토어 생성 (embedding=으로 키 이름 수정)
 vector_store = Chroma.from_documents(
     texts,
     embedding=embeddings,
