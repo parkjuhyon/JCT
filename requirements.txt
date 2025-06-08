@@ -1,10 +1,10 @@
-streamlit
-langchain
-cohere
-pypdf
+streamlit==1.45.1
+langchain==0.3.25
+langchain-community==0.3.24
+cohere==5.15.0
+pypdf==5.6.0
 protobuf==3.20.3
 opentelemetry-api==1.22.0
 opentelemetry-sdk==1.22.0
 numpy==1.24.4
-chromadb==0.4.6
-langchain-community==0.0.174
+chromadb==0.3.25
