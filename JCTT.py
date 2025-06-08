@@ -2,7 +2,7 @@ import os
 import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 
@@ -33,23 +33,29 @@ class CohereEmbeddings(Embeddings):
         )
         return response.embeddings[0]
 
-# --- PDF 문서 로드 ---
-pdf_files = ['H1J.pdf', 'H3J.pdf']  # 여기에 파일 추가 가능
+# --- 여러 PDF 파일 로드 ---
+pdf_files = ['H1J.pdf', 'H3J.pdf']  # 여기에 PDF 파일명 추가
+
 documents = []
-for file in pdf_files:
-    loader = PyPDFLoader(file)
+for pdf_file in pdf_files:
+    loader = PyPDFLoader(pdf_file)
     documents.extend(loader.load())
 
 # --- 텍스트 분할 ---
 text_splitter = CharacterTextSplitter(chunk_size=700, chunk_overlap=200)
 texts = text_splitter.split_documents(documents)
 
-# --- 벡터 저장소 생성 ---
+# --- 벡터 저장소 생성 (persist_directory 추가) ---
 embeddings = CohereEmbeddings(client=cohere_client)
-vector_store = Chroma.from_documents(texts, embedding=embeddings)
+vector_store = Chroma.from_documents(
+    texts,
+    embedding=embeddings,
+    persist_directory="./chroma_db"
+)
+
 retriever = vector_store.as_retriever(search_kwargs={"k": 4})
 
-# --- Chat API 호출 함수 ---
+# --- Cohere Chat API 호출 함수 ---
 def cohere_chat_generate(prompt: str) -> str:
     response = cohere_client.chat(message=prompt)
     return response.text
@@ -59,10 +65,7 @@ st.set_page_config(page_title="PDF 질문 답변 챗봇", page_icon="🤖", layo
 st.title("🤖 학교 전용 챗봇 (전공심화탐구)")
 
 if "messages" not in st.session_state:
-    st.session_state["messages"] = [{
-        "role": "assistant",
-        "content": "안녕하세요! 학교에 대해 궁금한 점을 물어보세요. (학사일정 등)"
-    }]
+    st.session_state["messages"] = [{"role": "assistant", "content": "안녕하세요! 학교에 대해 궁금한 점을 물어보세요. (학사일정)"}]
 
 for msg in st.session_state["messages"]:
     st.chat_message(msg["role"]).write(msg["content"])
@@ -76,7 +79,7 @@ def generate_response(user_question: str) -> str:
 Given the following summaries of a long document and a question, create a final answer with references ("SOURCES"), use "SOURCES" in capital letters regardless of the number of sources.
 If you don't know the answer, just say that "I don't know", don't try to make up an answer.
 If you need it, look it up on the internet.
-You MUST answer in Korean and in Markdown format.
+You MUST answer in Korean and in Markdown format
 
 ----------------
 {context}
@@ -84,7 +87,8 @@ You MUST answer in Korean and in Markdown format.
 질문: {user_question}
 답변:"""
 
-    return cohere_chat_generate(prompt)
+    answer = cohere_chat_generate(prompt)
+    return answer
 
 # --- 사용자 입력 처리 ---
 if user_input := st.chat_input("질문을 입력하세요."):
