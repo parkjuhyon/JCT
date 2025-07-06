@@ -6,11 +6,10 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 
-# Cohere API 키 설정
+# Cohere API 설정
 cohere_client = cohere.Client(api_key="r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo")
 
-
-# Cohere 임베딩 클래스 정의
+# 임베딩 클래스 정의
 class CohereEmbeddings(Embeddings):
     def __init__(self, client, model="embed-multilingual-v3.0"):
         self.client = client
@@ -19,7 +18,7 @@ class CohereEmbeddings(Embeddings):
     def embed_documents(self, texts):
         input_texts = [t if isinstance(t, str) else t.page_content for t in texts]
         response = self.client.embed(
-            texts=input_texts,
+            texts=input_text_texts,
             model=self.model,
             input_type="search_document"
         )
@@ -33,24 +32,31 @@ class CohereEmbeddings(Embeddings):
         )
         return response.embeddings[0]
 
-
-# PDF 문서 불러오기
+# PDF 파일 로딩
 pdf_files = ['H1J.pdf', 'H2J.pdf', 'H3J.pdf']
 documents = []
-for file in pdf_files:
-    loader = PyPDFLoader(file)
-    documents.extend(loader.load())
 
-# 텍스트 분할
+for file in pdf_files:
+    if not os.path.exists(file):
+        st.error(f"❌ PDF 파일 없음: {file}")
+    else:
+        loader = PyPDFLoader(file)
+        documents.extend(loader.load())
+
+# 문서 분할
 text_splitter = CharacterTextSplitter(chunk_size=700, chunk_overlap=200)
 texts = text_splitter.split_documents(documents)
 
-# 임베딩 설정
+# 임베딩 생성
 embeddings = CohereEmbeddings(client=cohere_client)
 
-# Chroma 벡터 DB 설정
+# 벡터스토어 디렉토리 설정
 persist_dir = "./chroma_db"
 if not os.path.exists(persist_dir):
+    os.makedirs(persist_dir)
+
+# Chroma 벡터 저장소 설정
+if not os.listdir(persist_dir):
     vector_store = Chroma.from_documents(
         texts,
         embedding=embeddings,
@@ -64,14 +70,12 @@ else:
 
 retriever = vector_store.as_retriever(search_kwargs={"k": 5})
 
-
-# Cohere chat 생성 함수
+# Cohere 챗 API 함수
 def cohere_chat_generate(prompt: str) -> str:
     response = cohere_client.chat(message=prompt)
     return response.text
 
-
-# Streamlit UI 구성
+# Streamlit UI
 st.set_page_config(page_title="PDF 기반 학교 전용 챗봇", page_icon="🤖", layout="wide")
 st.title("🤖 학교 전용 챗봇 (전공심화탐구)")
 
@@ -84,8 +88,7 @@ if "messages" not in st.session_state:
 for msg in st.session_state["messages"]:
     st.chat_message(msg["role"]).write(msg["content"])
 
-
-# 응답 생성
+# 답변 생성 함수
 def generate_response(user_question: str) -> str:
     docs = retriever.get_relevant_documents(user_question)
     context = "\n\n".join([doc.page_content for doc in docs])
@@ -103,8 +106,7 @@ You MUST answer in Korean and in Markdown format.
 
     return cohere_chat_generate(prompt)
 
-
-# 사용자 입력 처리
+# 사용자 질문 처리
 if user_input := st.chat_input("질문을 입력하세요."):
     st.session_state["messages"].append({"role": "user", "content": user_input})
     st.chat_message("user").write(user_input)
