@@ -55,7 +55,7 @@ def cohere_chat_generate(prompt: str) -> str:
 
 # --- 4. Streamlit UI 구성 ---
 st.set_page_config(page_title="PDF 기반 학교 전용 챗봇", page_icon="🤖", layout="wide")
-st.title("🤖 학교 전용 챗봇 (전공심화탐구)")
+st.title("학교 전용 챗봇 (전공심화탐구)")
 
 # 앱 실행 시 백그라운드에서 조용히 retriever를 준비합니다.
 retriever = setup_retriever()
