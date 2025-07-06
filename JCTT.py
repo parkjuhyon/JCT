@@ -6,10 +6,8 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 
-# Cohere API 클라이언트
 cohere_client = cohere.Client(api_key="r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo")
 
-# Cohere 임베딩 클래스 정의
 class CohereEmbeddings(Embeddings):
     def __init__(self, client, model="embed-multilingual-v3.0"):
         self.client = client
@@ -32,50 +30,45 @@ class CohereEmbeddings(Embeddings):
         )
         return response.embeddings[0]
 
-# PDF 파일 리스트 및 문서 로딩
 pdf_files = ['H1J.pdf', 'H2J.pdf', 'H3J.pdf']
 documents = []
-
 for file in pdf_files:
     if not os.path.exists(file):
-        st.error(f"❌ PDF 파일이 존재하지 않습니다: {file}")
+        st.error(f"PDF 파일이 없습니다: {file}")
     else:
         loader = PyPDFLoader(file)
         documents.extend(loader.load())
 
-# 텍스트 분할
 text_splitter = CharacterTextSplitter(chunk_size=700, chunk_overlap=200)
 texts = text_splitter.split_documents(documents)
 
-# 임베딩 생성
 embeddings = CohereEmbeddings(client=cohere_client)
 
-# Chroma DB 저장 폴더 설정
-persist_dir = "./chroma_db"
-if not os.path.exists(persist_dir):
-    os.makedirs(persist_dir)
+persist_directory = "chroma_db"
+os.makedirs(persist_directory, exist_ok=True)
 
-# Chroma 벡터 스토어 초기화 (DB 생성 또는 재사용)
-if not os.listdir(persist_dir):
+if not os.listdir(persist_directory):
+    # DB가 없으면 생성
     vector_store = Chroma.from_documents(
         texts,
         embedding=embeddings,
-        persist_directory=persist_dir
+        persist_directory=persist_directory,
+        collection_name="school_bot"
     )
 else:
+    # DB 있으면 재사용
     vector_store = Chroma(
-        persist_directory=persist_dir,
-        embedding_function=embeddings
+        persist_directory=persist_directory,
+        embedding_function=embeddings,
+        collection_name="school_bot"
     )
 
 retriever = vector_store.as_retriever(search_kwargs={"k": 5})
 
-# Cohere 챗봇 응답 생성 함수
 def cohere_chat_generate(prompt: str) -> str:
     response = cohere_client.chat(message=prompt)
     return response.text
 
-# Streamlit UI 구성
 st.set_page_config(page_title="PDF 기반 학교 전용 챗봇", page_icon="🤖", layout="wide")
 st.title("🤖 학교 전용 챗봇 (전공심화탐구)")
 
@@ -88,7 +81,6 @@ if "messages" not in st.session_state:
 for msg in st.session_state["messages"]:
     st.chat_message(msg["role"]).write(msg["content"])
 
-# 답변 생성 함수
 def generate_response(user_question: str) -> str:
     docs = retriever.get_relevant_documents(user_question)
     context = "\n\n".join([doc.page_content for doc in docs])
@@ -106,7 +98,6 @@ You MUST answer in Korean and in Markdown format.
 
     return cohere_chat_generate(prompt)
 
-# 사용자 입력 처리
 if user_input := st.chat_input("질문을 입력하세요."):
     st.session_state["messages"].append({"role": "user", "content": user_input})
     st.chat_message("user").write(user_input)
