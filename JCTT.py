@@ -13,7 +13,7 @@ from langchain.embeddings.base import Embeddings
 load_dotenv()
 
 # 상수 정의
-COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+COHERE_API_KEY = os.getenv("r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo")
 PDF_FILES = ['H1J.pdf', 'H2J.pdf', 'H3J.pdf']
 PERSIST_DIRECTORY = "chroma_db"
 COLLECTION_NAME = "school_bot"
