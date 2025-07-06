@@ -11,7 +11,7 @@ from langchain.embeddings.base import Embeddings
 # --- 1. 초기 설정 및 상수 정의 ---
 # API 키를 코드에 직접 입력합니다.
 # "여기에_실제_Cohere_API_키를_입력하세요" 부분을 실제 키로 교체해주세요.
-COHERE_API_KEY = "여기에_실제_Cohere_API_키를_입력하세요" 
+COHERE_API_KEY = "r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo" 
 
 PDF_FILES = ['H1J.pdf', 'H2J.pdf', 'H3J.pdf']
 PERSIST_DIRECTORY = "chroma_db"
