@@ -6,7 +6,7 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 
-cohere_client = cohere.Client(api_key="r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo")
+cohere_client = cohere.Client(api_key="YOUR_COHERE_API_KEY")
 
 class CohereEmbeddings(Embeddings):
     def __init__(self, client, model="embed-multilingual-v3.0"):
@@ -47,8 +47,12 @@ embeddings = CohereEmbeddings(client=cohere_client)
 persist_directory = "chroma_db"
 os.makedirs(persist_directory, exist_ok=True)
 
+# ⚠️ from_documents 호출 전에 texts가 빈 리스트인지 꼭 확인하세요!
+if not texts:
+    st.error("텍스트 데이터가 없습니다. PDF 파일을 확인하세요.")
+    st.stop()
+
 if not os.listdir(persist_directory):
-    # DB가 없으면 생성
     vector_store = Chroma.from_documents(
         texts,
         embedding=embeddings,
@@ -56,7 +60,6 @@ if not os.listdir(persist_directory):
         collection_name="school_bot"
     )
 else:
-    # DB 있으면 재사용
     vector_store = Chroma(
         persist_directory=persist_directory,
         embedding_function=embeddings,
