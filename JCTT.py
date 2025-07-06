@@ -35,7 +35,7 @@ class CohereEmbeddings(Embeddings):
 
 
 # PDF 문서 불러오기
-pdf_files = ['pdfs/H1J.pdf', 'pdfs/H2J.pdf', 'pdfs/H3J.pdf']
+pdf_files = ['H1J.pdf', 'H2J.pdf', 'H3J.pdf']
 documents = []
 for file in pdf_files:
     loader = PyPDFLoader(file)
