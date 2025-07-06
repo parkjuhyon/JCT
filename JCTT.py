@@ -2,18 +2,17 @@
 import os
 import streamlit as st
 import cohere
-from dotenv import load_dotenv
+# from dotenv import load_dotenv # 이 줄을 삭제하거나 주석 처리합니다.
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 
 # --- 1. 초기 설정 및 상수 정의 ---
-# .env 파일에서 환경 변수 로드
-load_dotenv()
+# API 키를 코드에 직접 입력합니다.
+# "여기에_실제_Cohere_API_키를_입력하세요" 부분을 실제 키로 교체해주세요.
+COHERE_API_KEY = "여기에_실제_Cohere_API_키를_입력하세요" 
 
-# 상수 정의
-COHERE_API_KEY = os.getenv("r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo")
 PDF_FILES = ['H1J.pdf', 'H2J.pdf', 'H3J.pdf']
 PERSIST_DIRECTORY = "chroma_db"
 COLLECTION_NAME = "school_bot"
@@ -41,8 +40,8 @@ class CohereEmbeddings(Embeddings):
 @st.cache_resource
 def load_vector_store():
     """PDF를 로드하고 Vector Store를 생성 또는 로드하는 함수 (Streamlit 캐싱 활용)"""
-    if not COHERE_API_KEY:
-        st.error("Cohere API 키가 설정되지 않았습니다. .env 파일을 확인하세요.")
+    if not COHERE_API_KEY or COHERE_API_KEY == "여기에_실제_Cohere_API_키를_입력하세요":
+        st.error("Cohere API 키가 코드에 설정되지 않았습니다. COHERE_API_KEY 변수를 확인하세요.")
         st.stop()
     
     cohere_client = cohere.Client(api_key=COHERE_API_KEY)
@@ -88,11 +87,10 @@ def generate_response(retriever, user_question: str) -> str:
     docs = retriever.get_relevant_documents(user_question)
     context = "\n\n".join([doc.page_content for doc in docs])
 
-    prompt = f"""Use the following pieces of context to answer the users question shortly.
-Given the following summaries of a long document and a question, create a final answer with references ("SOURCES"), use "SOURCES" in capital letters regardless of the number of sources.
-If you don't know the answer, just say that "I don't know", don't try to make up an answer.
-If you need it, look it up on the internet.
-You MUST answer in Korean and in Markdown format.
+    prompt = f"""다음 컨텍스트를 사용하여 사용자의 질문에 간결하게 답변하세요.
+참고 자료가 있을 경우, 대문자로 "SOURCES"를 명시하고 출처를 밝히세요.
+답을 모를 경우, 꾸며내지 말고 "잘 모르겠습니다"라고만 답변하세요.
+반드시 한국어와 마크다운 형식으로 답변해야 합니다.
 
 ----------------
 {context}
