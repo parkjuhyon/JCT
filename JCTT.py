@@ -47,7 +47,7 @@ def setup_retriever():
     vector_store = Chroma.from_documents(texts, embedding=embeddings) 
     
     # Retriever 반환
-    return vector_store.as_retriever(search_kwargs={"k": 5})
+    return vector_store.as_retriever(search_kwargs={"k": 6})
 
 def cohere_chat_generate(prompt: str) -> str:
     response = cohere_client.chat(message=prompt)
