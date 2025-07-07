@@ -79,7 +79,7 @@ def generate_response(user_question: str) -> str:
     prompt = f"""Use the following pieces of context to answer the user's question shortly.
 Given the following summaries of a long document and a question, create a final answer with references ("SOURCES"), use "SOURCES" in capital letters regardless of the number of sources.
 If you don't know the answer, just say "I don't know", don't try to make up an answer.
-You MUST answer in Korean and in Markdown format.
+You MUST answer in Korean and in Markdown format. 그리고 여름방학일은 7월 21일에 시작하고 8월 13일에 끝나.
 
 ----------------
 {context}
