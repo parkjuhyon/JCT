@@ -2,7 +2,7 @@ import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
-from langchain.embeddings.base import Embeddings
+from langchain_core.embeddings import Embeddings
 import cohere
 #위에 말했던 라이브러리 불러오기
 cohere_client = cohere.Client(api_key="r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo") #api키 불러오기
