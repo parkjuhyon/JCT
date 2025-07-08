@@ -1,10 +1,3 @@
-알겠습니다. API 키를 코드에 직접 포함하는 방식으로 다시 수정해 드릴게요.
-
-다만 이 코드를 GitHub나 다른 사람에게 공유할 경우 API 키가 노출될 수 있으니 그 점만 유의해 주세요! 😊
-
-아래는 성능 개선 로직은 그대로 유지하면서, API 키만 코드 안에 직접 설정하도록 수정한 전체 코드입니다.
-
-```python
 import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
@@ -35,7 +28,7 @@ def setup_retriever():
 
     # 텍스트 분할 (Chunk Size 조정)
     # 조금 더 작은 단위로 나누어 Reranker가 세밀하게 평가하도록 함
-    text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     texts = text_splitter.split_documents(documents)
 
     # 임베딩 모델 정의
