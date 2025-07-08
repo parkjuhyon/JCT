@@ -40,13 +40,13 @@ for file in pdf_files: #위에서 정의한 pdf_files을 file에 넣으면서 �
 
 #텍스트 분할
 #AI를 위한것
-text_splitter = CharacterTextSplitter(chunk_size=2000, chunk_overlap=500)#문서를 700자 단위로 나눔, 청크에 겹치는 문자 200자 설정해서 짤리는 상황 안만들게 함
+text_splitter = CharacterTextSplitter(chunk_size=3000, chunk_overlap=1000)#문서를 700자 단위로 나눔, 청크에 겹치는 문자 200자 설정해서 짤리는 상황 안만들게 함
 texts = text_splitter.split_documents(documents) #나눈 청크를 리스트로 저장
 
 #벡터 저장
 embeddings = CohereEmbeddings(client=cohere_client)#위에서 정의해놨던 Cohere 임베딩 만들기
 vector_store = Chroma.from_documents(texts, embedding=embeddings)#문서 임베딩하고 Chroma에 저장 -> 검색 가능하게 설정함
-retriever = vector_store.as_retriever(search_kwargs={"k": 5}) #가장 연관성이 있는 문서를 찾을려고 쓰는 코드 / k값 = 유사도라고 생각(원래 문서 개수를 설정하는데 3으로 설정하니까 자꾸 문서를 못찾아서 임의로 5로 설정함
+retriever = vector_store.as_retriever(search_kwargs={"k": 6}) #가장 연관성이 있는 문서를 찾을려고 쓰는 코드 / k값 = 유사도라고 생각(원래 문서 개수를 설정하는데 3으로 설정하니까 자꾸 문서를 못찾아서 임의로 5로 설정함
 
 def cohere_chat_generate(prompt: str) -> str:#Cohere 함수 정의하기
     response = cohere_client.chat(message=prompt)#프롬프트(뒤에 정의됨)를 기반으로 답변 만들기
