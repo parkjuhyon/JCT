@@ -40,13 +40,13 @@ for file in pdf_files: #위에서 정의한 pdf_files을 file에 넣으면서 �
 
 #텍스트 분할
 #AI를 위한것
-text_splitter = CharacterTextSplitter(chunk_size=3000, chunk_overlap=1000)#문서를 700자 단위로 나눔, 청크에 겹치는 문자 200자 설정해서 짤리는 상황 안만들게 함
+text_splitter = CharacterTextSplitter(chunk_size=700, chunk_overlap=200)#문서를 700자 단위로 나눔, 청크에 겹치는 문자 200자 설정해서 짤리는 상황 안만들게 함
 texts = text_splitter.split_documents(documents) #나눈 청크를 리스트로 저장
 
 #벡터 저장
 embeddings = CohereEmbeddings(client=cohere_client)#위에서 정의해놨던 Cohere 임베딩 만들기
 vector_store = Chroma.from_documents(texts, embedding=embeddings)#문서 임베딩하고 Chroma에 저장 -> 검색 가능하게 설정함
-retriever = vector_store.as_retriever(search_kwargs={"k": 6}) #가장 연관성이 있는 문서를 찾을려고 쓰는 코드 / k값 = 유사도라고 생각(원래 문서 개수를 설정하는데 3으로 설정하니까 자꾸 문서를 못찾아서 임의로 5로 설정함
+retriever = vector_store.as_retriever(search_kwargs={"k": 3}) #가장 연관성이 있는 문서를 찾을려고 쓰는 코드 / k값 = 유사도라고 생각(원래 문서 개수를 설정하는데 3으로 설정하니까 자꾸 문서를 못찾아서 임의로 5로 설정함
 
 def cohere_chat_generate(prompt: str) -> str:#Cohere 함수 정의하기
     response = cohere_client.chat(message=prompt)#프롬프트(뒤에 정의됨)를 기반으로 답변 만들기
@@ -68,17 +68,19 @@ def generate_response(user_question: str) -> str:
     docs = retriever.get_relevant_documents(user_question) #질문 관련 문서 찾기
     context = "\n\n".join([doc.page_content for doc in docs]) #pdf문서 내용을 문자열로 만들어서 저장
 
-    prompt = f"""Use the following pieces of context to answer the users question shortly.
-Given the following summaries of a long document and a question, create a final answer with references ("SOURCES"), use "SOURCES" in capital letters regardless of the number of sources.
-If you don't know the answer, just say that "I don't know", don't try to make up an answer.
-If you need it, look it up on the internet.
-You MUST answer in Korean and in Markdown format.
+	prompt = f"""You are an AI assistant for a school. Answer the user's question based ONLY on the provided context below.
+Your main goal is to provide accurate information based on the documents.
+If the answer is not available in the context, you MUST say "제공된 문서에서는 해당 정보를 찾을 수 없습니다."
+Do not try to make up an answer. Answer in Korean and in Markdown format.
 
-----------------
+CONTEXT:
 {context}
 
-질문: {user_question}
-답변:
+----------------
+
+QUESTION: {user_question}
+
+ANSWER:
 """ # {context}와 {user_q~}는 앞에서 만든 변수를 프롬포트에 넣은것, 프롬프트 내에서 SOURCES를 사용해서 참고 문헌 표시하기, 
 
     return cohere_chat_generate(prompt) #보이는거랑 똑같이 Cohere에서 답변 만들기
