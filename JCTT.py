@@ -78,9 +78,9 @@ CONTEXT:
 
 ----------------
 
-QUESTION: {user_question}
+질문: {user_question}
 
-ANSWER:
+답변:
 """ # {context}와 {user_q~}는 앞에서 만든 변수를 프롬포트에 넣은것, 프롬프트 내에서 SOURCES를 사용해서 참고 문헌 표시하기, 
 
     return cohere_chat_generate(prompt) #보이는거랑 똑같이 Cohere에서 답변 만들기
