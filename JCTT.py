@@ -68,7 +68,7 @@ def generate_response(user_question: str) -> str:
     docs = retriever.get_relevant_documents(user_question) #질문 관련 문서 찾기
     context = "\n\n".join([doc.page_content for doc in docs]) #pdf문서 내용을 문자열로 만들어서 저장
 
-	prompt = f"""You are an AI assistant for a school. Answer the user's question based ONLY on the provided context below.
+    prompt = f"""You are an AI assistant for a school. Answer the user's question based ONLY on the provided context below.
 Your main goal is to provide accurate information based on the documents.
 If the answer is not available in the context, you MUST say "제공된 문서에서는 해당 정보를 찾을 수 없습니다."
 Do not try to make up an answer. Answer in Korean and in Markdown format.
