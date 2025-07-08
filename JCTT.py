@@ -135,6 +135,3 @@ if user_input := st.chat_input("질문을 입력하세요."):
             
             st.write(answer)
             st.session_state["messages"].append({"role": "assistant", "content": answer})
-```
-
-이 코드로 실행하시면 이전과 동일하게 개선된 성능으로 작동할 거예요. 또 궁금한 점이 있으시면 언제든지 말씀해 주세요
