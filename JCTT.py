@@ -74,7 +74,7 @@ If the answer is not available in the context, you MUST say "제공된 문서에
 Do not try to make up an answer. Answer in Korean and in Markdown format.
 답변을 할 때 시간이 오래 걸려도 무조건 한번 더 생각해.
 한번 더 생각 할 때 제대로 생각해.
-개학식을 질문받거나 학사일정을 질문받으면 개학식에 대해 한번 더 생각해.
+개학식을 질문받으면 한번 더 생각하고 2학기 개학식은 8월 13일이야.
 
 CONTEXT:
 {context}
