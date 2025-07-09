@@ -76,6 +76,7 @@ Do not try to make up an answer. Answer in Korean and in Markdown format.
 한번 더 생각 할 때 제대로 생각해.
 개학식을 질문받으면 한번 더 생각하고 2학기 개학식은 8월 13일이야.
 그리고 학사일정을 질문받았을 때 개학식도 2학기엔 8월 13일이야.
+학사일정은 1학기, 2학기 순서로 출력해
 
 CONTEXT:
 {context}
