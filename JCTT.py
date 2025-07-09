@@ -40,7 +40,7 @@ for file in pdf_files: #위에서 정의한 pdf_files을 file에 넣으면서 �
 
 #텍스트 분할
 #AI를 위한것
-text_splitter = CharacterTextSplitter(chunk_size=700, chunk_overlap=200)#문서를 700자 단위로 나눔, 청크에 겹치는 문자 200자 설정해서 짤리는 상황 안만들게 함
+text_splitter = CharacterTextSplitter(chunk_size=700, chunk_overlap=300)#문서를 700자 단위로 나눔, 청크에 겹치는 문자 200자 설정해서 짤리는 상황 안만들게 함
 texts = text_splitter.split_documents(documents) #나눈 청크를 리스트로 저장
 
 #벡터 저장
