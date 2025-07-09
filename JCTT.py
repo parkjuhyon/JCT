@@ -1,4 +1,4 @@
-import streamlit as st
+-import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
@@ -40,7 +40,7 @@ for file in pdf_files: #위에서 정의한 pdf_files을 file에 넣으면서 �
 
 #텍스트 분할
 #AI를 위한것
-text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)#문서를 700자 단위로 나눔, 청크에 겹치는 문자 200자 설정해서 짤리는 상황 안만들게 함
+text_splitter = CharacterTextSplitter(chunk_size=800, chunk_overlap=100)#문서를 700자 단위로 나눔, 청크에 겹치는 문자 200자 설정해서 짤리는 상황 안만들게 함
 texts = text_splitter.split_documents(documents) #나눈 청크를 리스트로 저장
 
 #벡터 저장
@@ -73,7 +73,8 @@ Your main goal is to provide accurate information based on the documents.
 If the answer is not available in the context, you MUST say "제공된 문서에서는 해당 정보를 찾을 수 없습니다."
 Do not try to make up an answer. Answer in Korean and in Markdown format.
 답변을 할 때 시간이 오래 걸려도 무조건 한번 더 생각해.
-한번 더 생각 할 때 제대로 생각하고 만약 개학식을 질문받으면 제대로 다시 생각해.
+한번 더 생각 할 때 제대로 생각해.
+개학식을 질문받거나 학사일정을 질문받으면 개학식에 대해 한번 더 생각해.
 
 CONTEXT:
 {context}
