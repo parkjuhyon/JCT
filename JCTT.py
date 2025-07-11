@@ -5,7 +5,7 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 import cohere
 #위에 말했던 라이브러리 불러오기
-cohere_client = cohere.Client(api_key="r1Fl17yD8nqp8yoYtnpiGKZXPMadYECdMJHZ1hCo") #api키 불러오기
+cohere_client = cohere.Client(api_key="kZ6yQdHLBExCPGEmew6bXiXrZxCC5J41I2w2tyUT") #api키 불러오기
 
 class CohereEmbeddings(Embeddings): #LangChain에서 쓸 Cohere 임베딩 클래스 정의하기
     def __init__(self, client, model="embed-multilingual-v3.0"): # 클라이언트랑 모델 이름 지정 여기선 embed-multilingual -v3.0 모델 지정
