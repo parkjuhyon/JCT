@@ -79,7 +79,6 @@ Do not try to make up an answer. Answer in Korean and in Markdown format.
 학사일정은 1학기, 2학기 순서로 출력해
 학사일정을 질문받으면 무조건 재검토를 2번해. 그리고 일치한지 한번 더 확인해.
 방학식은 12월 30일이야 학사일정을 출력할때에도 참고해
-말이 끝나면 항상 이 말을 붙여 "저는 성능이 좋지 않아 대답이 올바르지 않을 수 있습니다."
 CONTEXT:
 {context}
 
